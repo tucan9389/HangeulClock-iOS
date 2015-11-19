@@ -35,7 +35,7 @@
     else {
         
         if (type==tcType_hour) {
-            return [self houreStringWithUnit:time];
+            return [self hourStringWithUnit:time];
         } else if (type==tcType_minute || type==tcType_month) {
             NSMutableString *hangulStr = [[NSMutableString alloc] initWithString:@""];
             int unit = 0;
@@ -86,7 +86,7 @@
     
     return nil;
 }
-- (NSString *)houreStringWithUnit:(NSInteger)time {
+- (NSString *)hourStringWithUnit:(NSInteger)time {
     if (time==0) return @"영";
     else if (time==1) return @"한";
     else if (time==2) return @"두";
