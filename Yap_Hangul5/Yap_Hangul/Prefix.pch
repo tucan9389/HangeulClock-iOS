@@ -45,6 +45,9 @@
 #define DEV_MAIL @"yapprj@gmail.com"
 #define APPSTORE_ID @(923856886)//한글시계 id : 923856886 , 기타코드 : 791551793
 #define APPSTORE_URL [NSString stringWithFormat:@"https://itunes.apple.com/app/id%@", APPSTORE_ID]
+#define ANDROID_BUNDLEID @"com.hangulclock.hansi"
+#define PLAYSTORE_URL [NSString stringWithFormat:@"https://play.google.com/store/apps/details?id=%@", ANDROID_BUNDLEID]
+#define WEB_URL @"https://www.behance.net/gallery/20603295/Hangul-Clock-(-)-for-iOS"
 
 #endif
 

@@ -14,6 +14,8 @@
 		259192A219ED7B61008FCADA /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 259192A119ED7B61008FCADA /* AdSupport.framework */; };
 		259192A419ED7B65008FCADA /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 259192A319ED7B65008FCADA /* MessageUI.framework */; };
 		259192B319ED7C49008FCADA /* libGoogleAnalyticsServices.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 259192B219ED7C49008FCADA /* libGoogleAnalyticsServices.a */; };
+		55AD10741C020DC700A4F95C /* KakaoOpenSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 55AD10731C020DC700A4F95C /* KakaoOpenSDK.framework */; };
+		55AD10781C02127500A4F95C /* IMG_0062.JPG in Resources */ = {isa = PBXBuildFile; fileRef = 55AD10771C02127500A4F95C /* IMG_0062.JPG */; };
 		849BE15219EB5AF100A42C1C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 849BE15119EB5AF100A42C1C /* main.m */; };
 		849BE15519EB5AF100A42C1C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 849BE15419EB5AF100A42C1C /* AppDelegate.m */; };
 		849BE15819EB5AF100A42C1C /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 849BE15719EB5AF100A42C1C /* MainViewController.m */; };
@@ -78,6 +80,8 @@
 		259192B019ED7C49008FCADA /* GAITrackedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAITrackedViewController.h; sourceTree = "<group>"; };
 		259192B119ED7C49008FCADA /* GAITracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAITracker.h; sourceTree = "<group>"; };
 		259192B219ED7C49008FCADA /* libGoogleAnalyticsServices.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libGoogleAnalyticsServices.a; sourceTree = "<group>"; };
+		55AD10731C020DC700A4F95C /* KakaoOpenSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KakaoOpenSDK.framework; sourceTree = "<group>"; };
+		55AD10771C02127500A4F95C /* IMG_0062.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_0062.JPG; sourceTree = "<group>"; };
 		849BE14C19EB5AF100A42C1C /* Yap_Hangul5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yap_Hangul5.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		849BE15019EB5AF100A42C1C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		849BE15119EB5AF100A42C1C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -151,6 +155,7 @@
 				259192A019ED7B5C008FCADA /* CoreData.framework in Frameworks */,
 				259192B319ED7C49008FCADA /* libGoogleAnalyticsServices.a in Frameworks */,
 				2591929E19ED7B57008FCADA /* SystemConfiguration.framework in Frameworks */,
+				55AD10741C020DC700A4F95C /* KakaoOpenSDK.framework in Frameworks */,
 				2591929C19ED7B50008FCADA /* libz.dylib in Frameworks */,
 				2591929A19ED7B42008FCADA /* libsqlite3.dylib in Frameworks */,
 			);
@@ -182,6 +187,14 @@
 				259192B219ED7C49008FCADA /* libGoogleAnalyticsServices.a */,
 			);
 			path = GoogleAnalytics;
+			sourceTree = "<group>";
+		};
+		55AD10701C02042300A4F95C /* KakaoSDK */ = {
+			isa = PBXGroup;
+			children = (
+				55AD10731C020DC700A4F95C /* KakaoOpenSDK.framework */,
+			);
+			name = KakaoSDK;
 			sourceTree = "<group>";
 		};
 		55D86FA91BC6E66000982D92 /* Font */ = {
@@ -230,6 +243,7 @@
 				55D86FA91BC6E66000982D92 /* Font */,
 				849BE18419EB5B7C00A42C1C /* TimeEngine */,
 				849BE15E19EB5AF100A42C1C /* LaunchScreen.xib */,
+				55AD10771C02127500A4F95C /* IMG_0062.JPG */,
 				849BE14F19EB5AF100A42C1C /* Supporting Files */,
 			);
 			path = Yap_Hangul;
@@ -271,6 +285,7 @@
 		849BE17519EB5B7C00A42C1C /* Extern */ = {
 			isa = PBXGroup;
 			children = (
+				55AD10701C02042300A4F95C /* KakaoSDK */,
 				259192A719ED7C49008FCADA /* GoogleAnalytics */,
 				849BE17619EB5B7C00A42C1C /* AHEasing */,
 				849BE17919EB5B7C00A42C1C /* UIView+EasingFunctions */,
@@ -512,6 +527,7 @@
 				849BE19C19EB5B7C00A42C1C /* NanumGothic.otf in Resources */,
 				849BE19F19EB5B7C00A42C1C /* NanumGothicLight.otf in Resources */,
 				849BE19E19EB5B7C00A42C1C /* NanumGothicExtraBold.otf in Resources */,
+				55AD10781C02127500A4F95C /* IMG_0062.JPG in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -679,9 +695,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Doyoung Gwak (5WXJ4Z4H69)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Yap_Hangul/Extern",
+				);
 				GCC_PREFIX_HEADER = Yap_Hangul/Prefix.pch;
 				INFOPLIST_FILE = Yap_Hangul/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
@@ -690,8 +710,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Yap_Hangul/Extern/GoogleAnalytics",
 				);
+				OTHER_LDFLAGS = "-all_load";
 				PRODUCT_NAME = Yap_Hangul5;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "344a26d7-bc49-467e-abdf-a3455df41823";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -701,9 +722,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Doyoung Gwak (5WXJ4Z4H69)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Yap_Hangul/Extern",
+				);
 				GCC_PREFIX_HEADER = Yap_Hangul/Prefix.pch;
 				INFOPLIST_FILE = Yap_Hangul/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
@@ -712,8 +737,9 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Yap_Hangul/Extern/GoogleAnalytics",
 				);
+				OTHER_LDFLAGS = "-all_load";
 				PRODUCT_NAME = Yap_Hangul5;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "344a26d7-bc49-467e-abdf-a3455df41823";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
