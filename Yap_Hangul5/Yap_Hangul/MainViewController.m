@@ -39,8 +39,8 @@
     CGSize winSize ;
     
     // 회전하지 않는 배경 노드
-    UIImageView *portraitBackGroundImageView;
-    UIImageView *landscapeBackGroundImageView;
+    UIImageView *portraitBackgroundImageView;
+    UIImageView *landscapeBackgroundImageView;
     
     // 회전하는 배경 노드
     UIView *rotateView;
@@ -107,28 +107,8 @@
     //    [RoationController shared].rootOrientation = [[UIDevice currentDevice] orientation];
     //    defaultAngle = [[RoationController shared] degreeWithOrientation:[[UIDevice currentDevice] orientation]]*90;
     
-    NSString *bgImageName_p = nil;
-    NSString *bgImageName_l = nil;
-    if (ISIPAD) {
-        bgImageName_p = @"LaunchImage-700-Portrait~ipad";
-        bgImageName_l = @"LaunchImage-700-Landscape~ipad";
-    } else {
-        bgImageName_p = @"LaunchImage-800-667h@2x.png";
-        bgImageName_l = @"LaunchImage-Landscape";
-    }
-    
     self.view.backgroundColor = [UIColor blackColor];
-    UIImage *bgImage_p = [UIImage imageNamed:bgImageName_p];
-    portraitBackGroundImageView = [[UIImageView alloc] initWithImage:bgImage_p];
-    portraitBackGroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.width*(bgImage_p.size.height/bgImage_p.size.width));
-    [self.view addSubview:portraitBackGroundImageView];
-    UIImage *bgImage_l = [UIImage imageNamed:bgImageName_l];
-    landscapeBackGroundImageView = [[UIImageView alloc] initWithImage:bgImage_l];
-    landscapeBackGroundImageView.frame = CGRectMake(0, 0, winSize.width*(bgImage_l.size.width/bgImage_l.size.height), winSize.width);
-    [self.view addSubview:landscapeBackGroundImageView];
-    if (([[UIApplication sharedApplication] statusBarOrientation]==UIDeviceOrientationLandscapeRight)||
-        ([[UIApplication sharedApplication] statusBarOrientation]==UIDeviceOrientationLandscapeLeft))landscapeBackGroundImageView.alpha = 1;
-    else landscapeBackGroundImageView.alpha = 0;
+    [self makeBackgroundImageView];
 
     rotateView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     [self.view addSubview:rotateView];
@@ -159,8 +139,32 @@
     // Dispose of any resources that can be recreated.
 }
 
-
-
+- (void)makeBackgroundImageView {
+    NSString *portraitBackgroundImageName = nil;
+    NSString *landscapeBackgroundImageName = nil;
+    
+    if (ISIPAD) {
+        portraitBackgroundImageName = @"LaunchImage-700-Portrait~ipad";
+        landscapeBackgroundImageName = @"LaunchImage-700-Landscape~ipad";
+    } else {
+        portraitBackgroundImageName = @"LaunchImage-800-667h@2x.png";
+        landscapeBackgroundImageName = @"LaunchImage-Landscape";
+    }
+    
+    UIImage *portraitBackgroundImage = [UIImage imageNamed:portraitBackgroundImageName];
+    portraitBackgroundImageView = [[UIImageView alloc] initWithImage:portraitBackgroundImage];
+    portraitBackgroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.width *(portraitBackgroundImage.size.height / portraitBackgroundImage.size.width));
+    [self.view addSubview:portraitBackgroundImageView];
+    
+    UIImage *landscapeBackGroundImage = [UIImage imageNamed:landscapeBackgroundImageName];
+    landscapeBackgroundImageView = [[UIImageView alloc] initWithImage:landscapeBackGroundImage];
+    landscapeBackgroundImageView.frame = CGRectMake(0, 0, winSize.width * (landscapeBackGroundImage.size.width / landscapeBackGroundImage.size.height), winSize.width);
+    [self.view addSubview:landscapeBackgroundImageView];
+    
+    if (([[UIApplication sharedApplication] statusBarOrientation]==UIDeviceOrientationLandscapeRight)||
+        ([[UIApplication sharedApplication] statusBarOrientation]==UIDeviceOrientationLandscapeLeft))landscapeBackgroundImageView.alpha = 1;
+    else landscapeBackgroundImageView.alpha = 0;
+}
 
 #define BOTTOM_LABEL_Y ((ISIPAD)?(56.f):((winSize.width>winSize.height)?(16.f):(56.f)))
 #define BOTTOM_LABEL_X ((ISIPAD)?(44.f):((winSize.width>winSize.height)?(10.f):(14.f)))
@@ -817,16 +821,16 @@
     mainTouchView.winSize = winSize;
     
     
-    portraitBackGroundImageView.alpha = 1;
+    portraitBackgroundImageView.alpha = 1;
     [UIView animateWithDuration:ROTATION_DELAY_TIME delay:0 options:UIViewAnimationOptionTransitionNone animations:^{
-        portraitBackGroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.height);
-        portraitBackGroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.height);
+        portraitBackgroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.height);
+        portraitBackgroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.height);
         if ([RoationController shared].isLandscape) {
             //            bgImageView_p.alpha = 0;
-            landscapeBackGroundImageView.alpha = 1;
+            landscapeBackgroundImageView.alpha = 1;
         } else {
             //            bgImageView_p.alpha = 1;
-            landscapeBackGroundImageView.alpha = 0;
+            landscapeBackgroundImageView.alpha = 0;
         }
     } completion:nil];
     
