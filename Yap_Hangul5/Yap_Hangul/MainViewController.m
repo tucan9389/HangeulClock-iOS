@@ -32,6 +32,7 @@
 
 #define TAG_ACTION_MOVETO 112
 
+//TODO: property로 변환
 @interface MainViewController () <TimeChangeDelegate, RotateDelegate> {
     //    UIEffectLabel *effectLabel;
     //    FWLabelView *yeardateLabelView;
@@ -40,7 +41,6 @@
     // 회전하지 않는 배경 노드
     UIImageView *bgImageView_p;
     UIImageView *bgImageView_l;
-    
     
     // 회전하는 배경 노드
     UIView *rotateView;
@@ -56,20 +56,6 @@
     //    EffectLabel *dateEffectLabel;  /**/
     AMLabelView *ampmLabelView;
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     UIEffectLabel *ampmEffectLabel;
     UIEffectLabel *weekDayEffectLabel;
     
@@ -81,21 +67,11 @@
     
     BOOL timeLabelInit;
     
-    
-    
-    
-    
-    
-    
-    
-    
     HangulConverter *converter ;
-    
     
     MainTouchView *mainTouchView;
     MenuView *menuView;
 }
-
 
 @end
 
