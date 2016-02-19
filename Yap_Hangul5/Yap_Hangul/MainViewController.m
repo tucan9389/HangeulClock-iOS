@@ -161,9 +161,17 @@
     landscapeBackgroundImageView.frame = CGRectMake(0, 0, winSize.width * (landscapeBackGroundImage.size.width / landscapeBackGroundImage.size.height), winSize.width);
     [self.view addSubview:landscapeBackgroundImageView];
     
-    if (([[UIApplication sharedApplication] statusBarOrientation]==UIDeviceOrientationLandscapeRight)||
-        ([[UIApplication sharedApplication] statusBarOrientation]==UIDeviceOrientationLandscapeLeft))landscapeBackgroundImageView.alpha = 1;
-    else landscapeBackgroundImageView.alpha = 0;
+    if ([self isHorizontal]) {
+        landscapeBackgroundImageView.alpha = 1;
+    }
+    else {
+        landscapeBackgroundImageView.alpha = 0;
+    }
+}
+
+- (BOOL)isHorizontal {
+    return [[UIApplication sharedApplication] statusBarOrientation] == UIDeviceOrientationLandscapeRight ||
+    [[UIApplication sharedApplication] statusBarOrientation] == UIDeviceOrientationLandscapeLeft;
 }
 
 #define BOTTOM_LABEL_Y ((ISIPAD)?(56.f):((winSize.width>winSize.height)?(16.f):(56.f)))
