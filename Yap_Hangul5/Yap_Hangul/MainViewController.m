@@ -39,8 +39,8 @@
     CGSize winSize ;
     
     // 회전하지 않는 배경 노드
-    UIImageView *bgImageView_p;
-    UIImageView *bgImageView_l;
+    UIImageView *portraitBackGroundImageView;
+    UIImageView *landscapeBackGroundImageView;
     
     // 회전하는 배경 노드
     UIView *rotateView;
@@ -119,16 +119,16 @@
     
     self.view.backgroundColor = [UIColor blackColor];
     UIImage *bgImage_p = [UIImage imageNamed:bgImageName_p];
-    bgImageView_p = [[UIImageView alloc] initWithImage:bgImage_p];
-    bgImageView_p.frame = CGRectMake(0, 0, winSize.width, winSize.width*(bgImage_p.size.height/bgImage_p.size.width));
-    [self.view addSubview:bgImageView_p];
+    portraitBackGroundImageView = [[UIImageView alloc] initWithImage:bgImage_p];
+    portraitBackGroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.width*(bgImage_p.size.height/bgImage_p.size.width));
+    [self.view addSubview:portraitBackGroundImageView];
     UIImage *bgImage_l = [UIImage imageNamed:bgImageName_l];
-    bgImageView_l = [[UIImageView alloc] initWithImage:bgImage_l];
-    bgImageView_l.frame = CGRectMake(0, 0, winSize.width*(bgImage_l.size.width/bgImage_l.size.height), winSize.width);
-    [self.view addSubview:bgImageView_l];
+    landscapeBackGroundImageView = [[UIImageView alloc] initWithImage:bgImage_l];
+    landscapeBackGroundImageView.frame = CGRectMake(0, 0, winSize.width*(bgImage_l.size.width/bgImage_l.size.height), winSize.width);
+    [self.view addSubview:landscapeBackGroundImageView];
     if (([[UIApplication sharedApplication] statusBarOrientation]==UIDeviceOrientationLandscapeRight)||
-        ([[UIApplication sharedApplication] statusBarOrientation]==UIDeviceOrientationLandscapeLeft))bgImageView_l.alpha = 1;
-    else bgImageView_l.alpha = 0;
+        ([[UIApplication sharedApplication] statusBarOrientation]==UIDeviceOrientationLandscapeLeft))landscapeBackGroundImageView.alpha = 1;
+    else landscapeBackGroundImageView.alpha = 0;
 
     rotateView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     [self.view addSubview:rotateView];
@@ -817,16 +817,16 @@
     mainTouchView.winSize = winSize;
     
     
-    bgImageView_p.alpha = 1;
+    portraitBackGroundImageView.alpha = 1;
     [UIView animateWithDuration:ROTATION_DELAY_TIME delay:0 options:UIViewAnimationOptionTransitionNone animations:^{
-        bgImageView_p.frame = CGRectMake(0, 0, winSize.width, winSize.height);
-        bgImageView_l.frame = CGRectMake(0, 0, winSize.width, winSize.height);
+        portraitBackGroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.height);
+        portraitBackGroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.height);
         if ([RoationController shared].isLandscape) {
             //            bgImageView_p.alpha = 0;
-            bgImageView_l.alpha = 1;
+            landscapeBackGroundImageView.alpha = 1;
         } else {
             //            bgImageView_p.alpha = 1;
-            bgImageView_l.alpha = 0;
+            landscapeBackGroundImageView.alpha = 0;
         }
     } completion:nil];
     
