@@ -124,7 +124,6 @@
     }
     
     if (@available(iOS 11.0, *)) {
-//        NSLog(@"topPadding: %f", self.topLayoutGuide.length);
         winSize = CGSizeMake(winSize.width, winSize.height - self.topLayoutGuide.length - self.bottomLayoutGuide.length);
     }
 }
