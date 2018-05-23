@@ -34,8 +34,6 @@
 
 //TODO: property로 변환
 @interface MainViewController () <TimeChangeDelegate, RotateDelegate> {
-    //    UIEffectLabel *effectLabel;
-    //    FWLabelView *yeardateLabelView;
     CGSize winSize ;
     
     // 회전하지 않는 배경 노드
@@ -48,18 +46,16 @@
     
     // rotateView위에 올라가있는 레이블 (:UIView)
     FWLabelView *yeardateLabelView;
-    //    AMLabelView *yeardateLabelView;
     
     AMLabelView *hourLabelView;
     AMLabelView *minuteLabelView;
-    AMLabelView *secondLabelView;  /**/
-    //    EffectLabel *dateEffectLabel;  /**/
+    AMLabelView *secondLabelView;
+    
     AMLabelView *ampmLabelView;
     
     UIEffectLabel *ampmEffectLabel;
     UIEffectLabel *weekDayEffectLabel;
     
-    //    EffectLabel *dayEffectLabel;
     UIEffectLabel *monthEffectLabel;
     UIEffectLabel *yearEffectLabel;
     
@@ -83,13 +79,10 @@
     [[UIApplication sharedApplication] setStatusBarHidden:YES];
     // Do any additional setup after loading the view, typically from a nib.
     
-    //    [self performSelector:@selector(makeLabel) withObject:nil afterDelay:1.f];
-    
     timeLabelInit = NO;
     nowRotateAnimate = NO;
     
     converter = [[HangulConverter alloc] init];
-    //        NSLog(@"초중종성 : [%@]", [converter linearHangul:@"아"]);
     [TimeEngine shared].changeType = tType_second;
     [TimeEngine shared].afterInterval = .1f;
     [TimeEngine shared].delegate = self;
@@ -116,13 +109,7 @@
     mainTouchView.winSize = winSize;
     
     [OptionController shared].mainViewController = self;
-    //        NSLog(@"%@", [UIFont fontNamesForFamilyName:FONT_NORMAL]);
-//    NSLog(@"view did load");
-    
-    
-    
-    //    [[RoationController shared].delegateArray addObject:self];
-    
+
 }
 
 - (void)setWinsize {
@@ -190,30 +177,11 @@
 - (CGPoint) getMonthLabelPointWithYearLabelPoint:(CGPoint)yearLabelPoint {
     return CGPointMake(winSize.width-BOTTOM_LABEL_X-[monthEffectLabel getWidth],yearLabelPoint.y-BOGGOM_LABEL_GAP_Y);
 }
-//- (CGPoint) getDayLabelPointWithYearLabelPoint:(CGPoint)monthLabelPoint {
-//    return CGPointMake(winSize.width/2.f-BOTTOM_LABEL_X-[dayEffectLabel getWidth], monthLabelPoint.y+BOGGOM_LABEL_GAP_Y);
-//}
 - (CGPoint) getWeekLabelPointWithMonthDayLabelPoint:(CGPoint)dayLabelPoint {
     return CGPointMake(winSize.width-BOTTOM_LABEL_X-[weekDayEffectLabel getWidth], dayLabelPoint.y-BOTTOM_LABEL_GAP2_Y);
 }
 - (CGPoint) getAMPMLabelPointWithWeekLabelPoint:(CGPoint)weekLabelPoint {
     return CGPointMake(winSize.width-BOTTOM_LABEL_X-[ampmEffectLabel getWidth], weekLabelPoint.y-BOGGOM_LABEL_GAP_Y);
-}
-
-#pragma mark - 터치
--(void) ccTouchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    //    [touchController ccTouchesBegan:touches withEvent:event];
-}
--(void) ccTouchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-    //    [touchController ccTouchesMoved:touches withEvent:event];
-}
--(void) ccTouchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
-    //    [touchController ccTouchesCancelled:touches withEvent:event];
-}
--(void) ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    //    [OptionController shared].mainLayer = self;
-    //    [touchController ccTouchesEnded:touches withEvent:event];
-    
 }
 
 
@@ -248,6 +216,7 @@
     
 }
 - (void) timeChanged:(NSDate *)date changeType:(enum TimeChangeType)type {
+    
     if (![OptionController shared].dateOff) {
         if (!yeardateLabelView) {
             float width = (![[RoationController shared] isLandscape])?(winSize.width):(winSize.height);
@@ -276,12 +245,32 @@
     float hourLabelX = 0.f;
     float hourLabelW = 0.f;
     float hourLabelY = 0.f;
-    {
+    
         
-        if (![[RoationController shared] isLandscape]) {
+    if (![[RoationController shared] isLandscape]) {
+        
+        if (!hourLabelView) {
+            hourLabelView = [[AMLabelView alloc] initWithFontName:FONT_EXTRABOLD fontSize:HOUR_FONTSIZE*SCREENRATE];
+            NSString *hourText = nil;
+            if (![OptionController shared].ampmOff) {
+                if (date.hour%12==0) {
+                    hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:12 timeType:tcType_hour]];
+                } else {
+                    hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%12 timeType:tcType_hour]];
+                }
+            } else {
+                hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%24 timeType:tcType_hour]];
+            }
             
-            if (!hourLabelView) {
-                hourLabelView = [[AMLabelView alloc] initWithFontName:FONT_EXTRABOLD fontSize:HOUR_FONTSIZE*SCREENRATE];
+            hourLabelW = [hourLabelView changeText:hourText];
+            hourLabelX = winSize.width-PORTRAIT_STANDARD_X_GAP-hourLabelW;
+            CGPoint targetPoint = CGPointMake(hourLabelX ,
+                                              (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
+            hourLabelY = targetPoint.y+hourLabelView.frame.size.height/2.f;
+            hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y, hourLabelView.frame.size.width, hourLabelView.frame.size.height);
+            [rotateView addSubview:hourLabelView];
+        } else {
+            if (type&tType_hour) {
                 NSString *hourText = nil;
                 if (![OptionController shared].ampmOff) {
                     if (date.hour%12==0) {
@@ -295,135 +284,125 @@
                 
                 hourLabelW = [hourLabelView changeText:hourText];
                 hourLabelX = winSize.width-PORTRAIT_STANDARD_X_GAP-hourLabelW;
-                CGPoint targetPoint = CGPointMake(hourLabelX ,
-                                                  (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
+                CGPoint targetPoint = CGPointMake(hourLabelX , (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
                 hourLabelY = targetPoint.y+hourLabelView.frame.size.height/2.f;
-                hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y, hourLabelView.frame.size.width, hourLabelView.frame.size.height);
-                [rotateView addSubview:hourLabelView];
+                
+                [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
+                    [hourLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
+                    hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                     hourLabelView.frame.size.width,
+                                                     hourLabelView.frame.size.height);
+                } completion:^(BOOL finished) {
+                    [hourLabelView removeEasingFunctionForKeyPath:@"center"];
+                }];
+            } else {
+                hourLabelX = hourLabelView.frame.origin.x;
+                hourLabelY = hourLabelView.frame.origin.y+hourLabelView.frame.size.height/2.f;
+                hourLabelW = hourLabelView.frame.size.width;
+            }
+            
+        }
+        
+        
+        
+        if (![OptionController shared].ampmOff) {
+            if (!ampmLabelView) {
+                float ampmW = 0.f;
+                ampmLabelView = [[AMLabelView alloc] initWithFontName:FONT_BOLD fontSize:AMPM_FONTSIZE*SCREENRATE];
+                [rotateView addSubview:ampmLabelView];
+                if (date.hour<12) {
+                    ampmW = [ampmLabelView changeText:@"오전"];
+                } else {
+                    ampmW = [ampmLabelView changeText:@"오후"];
+                }
+                CGPoint targetPoint = CGPointMake(hourLabelX-ampmLabelView.frame.size.width+0.f,
+                                                  hourLabelY-ampmLabelView.frame.size.height/2.f-ampmLabelView.frame.size.height*AMPM_EXTRAGAP_Y_RATE);
+                ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                 ampmLabelView.frame.size.width, ampmLabelView.frame.size.height);
             } else {
                 if (type&tType_hour) {
-                    NSString *hourText = nil;
-                    if (![OptionController shared].ampmOff) {
-                        if (date.hour%12==0) {
-                            hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:12 timeType:tcType_hour]];
-                        } else {
-                            hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%12 timeType:tcType_hour]];
-                        }
-                    } else {
-                        hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%24 timeType:tcType_hour]];
-                    }
-                    
-                    hourLabelW = [hourLabelView changeText:hourText];
-                    hourLabelX = winSize.width-PORTRAIT_STANDARD_X_GAP-hourLabelW;
-                    CGPoint targetPoint = CGPointMake(hourLabelX , (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
-                    hourLabelY = targetPoint.y+hourLabelView.frame.size.height/2.f;
-                    
-                    [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
-                        [hourLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
-                        hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                         hourLabelView.frame.size.width,
-                                                         hourLabelView.frame.size.height);
-                    } completion:^(BOOL finished) {
-                        [hourLabelView removeEasingFunctionForKeyPath:@"center"];
-                    }];
-                } else {
-                    hourLabelX = hourLabelView.frame.origin.x;
-                    hourLabelY = hourLabelView.frame.origin.y+hourLabelView.frame.size.height/2.f;
-                    hourLabelW = hourLabelView.frame.size.width;
-                }
-                
-            }
-            
-            
-            
-            if (![OptionController shared].ampmOff) {
-                if (!ampmLabelView) {
-                    float ampmW = 0.f;
-                    ampmLabelView = [[AMLabelView alloc] initWithFontName:FONT_BOLD fontSize:AMPM_FONTSIZE*SCREENRATE];
-                    [rotateView addSubview:ampmLabelView];
                     if (date.hour<12) {
-                        ampmW = [ampmLabelView changeText:@"오전"];
+                        [ampmLabelView changeText:@"오전"];
                     } else {
-                        ampmW = [ampmLabelView changeText:@"오후"];
+                        [ampmLabelView changeText:@"오후"];
                     }
+                    
                     CGPoint targetPoint = CGPointMake(hourLabelX-ampmLabelView.frame.size.width+0.f,
                                                       hourLabelY-ampmLabelView.frame.size.height/2.f-ampmLabelView.frame.size.height*AMPM_EXTRAGAP_Y_RATE);
-                    ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                     ampmLabelView.frame.size.width, ampmLabelView.frame.size.height);
-//                    NSLog(@"ampmLabelView.frame:%@", NSStringFromCGRect(ampmLabelView.frame));
+                    [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
+                        [ampmLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
+                        ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                         ampmLabelView.frame.size.width,
+                                                         ampmLabelView.frame.size.height);
+                    } completion:^(BOOL finished) {
+                        [ampmLabelView removeEasingFunctionForKeyPath:@"center"];
+                    }];
                 } else {
-                    if (type&tType_hour) {
-                        if (date.hour<12) {
-                            [ampmLabelView changeText:@"오전"];
-                        } else {
-                            [ampmLabelView changeText:@"오후"];
-                        }
-                        
-                        CGPoint targetPoint = CGPointMake(hourLabelX-ampmLabelView.frame.size.width+0.f,
-                                                          hourLabelY-ampmLabelView.frame.size.height/2.f-ampmLabelView.frame.size.height*AMPM_EXTRAGAP_Y_RATE);
-                        [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
-                            [ampmLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
-                            ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                             ampmLabelView.frame.size.width,
-                                                             ampmLabelView.frame.size.height);
-                        } completion:^(BOOL finished) {
-                            [ampmLabelView removeEasingFunctionForKeyPath:@"center"];
-                        }];
-                    } else {
-                        
-                    }
+                    
                 }
             }
-            
-            
-        } else {
-            
-            
-            BOOL hourInit = NO;
-            if (!hourLabelView) {
-                hourInit=  YES;
-                hourLabelView = [[AMLabelView alloc] initWithFontName:FONT_EXTRABOLD fontSize:HOUR_FONTSIZE*SCREENRATE];
-                NSString *hourText = nil;
-                if (![OptionController shared].ampmOff) {
-                    if (date.hour%12==0) {
-                        hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:12 timeType:tcType_hour]];
-                    } else {
-                        hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%12 timeType:tcType_hour]];
-                    }
-                } else {
-                    hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%24 timeType:tcType_hour]];
-                }
-                
-                hourLabelW = [hourLabelView changeText:hourText];
-                
-                CGPoint targetPoint = CGPointMake(0.f,
-                                                  (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
-                hourLabelY = targetPoint.y+hourLabelView.frame.size.height/2.f;
-                hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                 hourLabelView.frame.size.width,
-                                                 hourLabelView.frame.size.height);
-                [rotateView addSubview:hourLabelView];
-            } else {
-                NSString *hourText = nil;
-                if (![OptionController shared].ampmOff) {
-                    if (date.hour%12==0) {
-                        hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:12 timeType:tcType_hour]];
-                    } else {
-                        hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%12 timeType:tcType_hour]];
-                    }
-                } else {
-                    hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%24 timeType:tcType_hour]];
-                }
-                hourLabelW = [hourLabelView changeText:hourText];
-                hourLabelY = hourLabelView.frame.origin.y+hourLabelView.frame.size.height/2.f;
-            }
-            float ampmW = 0.f;
-            float ampmX = LANDSCAPE_STANDARD_X_GAP;
-            
+        }
+        
+        
+    } else {
+        
+        
+        BOOL hourInit = NO;
+        if (!hourLabelView) {
+            hourInit=  YES;
+            hourLabelView = [[AMLabelView alloc] initWithFontName:FONT_EXTRABOLD fontSize:HOUR_FONTSIZE*SCREENRATE];
+            NSString *hourText = nil;
             if (![OptionController shared].ampmOff) {
-                if (!ampmLabelView) {
-                    ampmLabelView = [[AMLabelView alloc] initWithFontName:FONT_BOLD fontSize:AMPM_FONTSIZE*SCREENRATE];
-                    [rotateView addSubview:ampmLabelView];
+                if (date.hour%12==0) {
+                    hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:12 timeType:tcType_hour]];
+                } else {
+                    hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%12 timeType:tcType_hour]];
+                }
+            } else {
+                hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%24 timeType:tcType_hour]];
+            }
+            
+            hourLabelW = [hourLabelView changeText:hourText];
+            
+            CGPoint targetPoint = CGPointMake(0.f,
+                                              (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
+            hourLabelY = targetPoint.y+hourLabelView.frame.size.height/2.f;
+            hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                             hourLabelView.frame.size.width,
+                                             hourLabelView.frame.size.height);
+            [rotateView addSubview:hourLabelView];
+        } else {
+            NSString *hourText = nil;
+            if (![OptionController shared].ampmOff) {
+                if (date.hour%12==0) {
+                    hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:12 timeType:tcType_hour]];
+                } else {
+                    hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%12 timeType:tcType_hour]];
+                }
+            } else {
+                hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%24 timeType:tcType_hour]];
+            }
+            hourLabelW = [hourLabelView changeText:hourText];
+            hourLabelY = hourLabelView.frame.origin.y+hourLabelView.frame.size.height/2.f;
+        }
+        float ampmW = 0.f;
+        float ampmX = LANDSCAPE_STANDARD_X_GAP;
+        
+        if (![OptionController shared].ampmOff) {
+            if (!ampmLabelView) {
+                ampmLabelView = [[AMLabelView alloc] initWithFontName:FONT_BOLD fontSize:AMPM_FONTSIZE*SCREENRATE];
+                [rotateView addSubview:ampmLabelView];
+                if (date.hour<12) {
+                    ampmW = [ampmLabelView changeText:@"오전"];
+                } else {
+                    ampmW = [ampmLabelView changeText:@"오후"];
+                }
+                CGPoint targetPoint = CGPointMake(ampmX,
+                                                  hourLabelY-ampmLabelView.frame.size.height/2.f-ampmLabelView.frame.size.height*AMPM_EXTRAGAP_Y_RATE);
+                ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                 ampmLabelView.frame.size.width, ampmLabelView.frame.size.height);
+            } else {
+                if (type&tType_hour) {
                     if (date.hour<12) {
                         ampmW = [ampmLabelView changeText:@"오전"];
                     } else {
@@ -431,213 +410,183 @@
                     }
                     CGPoint targetPoint = CGPointMake(ampmX,
                                                       hourLabelY-ampmLabelView.frame.size.height/2.f-ampmLabelView.frame.size.height*AMPM_EXTRAGAP_Y_RATE);
-                    ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                     ampmLabelView.frame.size.width, ampmLabelView.frame.size.height);
+                    [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
+                        [ampmLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
+                        ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                         ampmLabelView.frame.size.width,
+                                                         ampmLabelView.frame.size.height);
+                    } completion:^(BOOL finished) {
+                        [ampmLabelView removeEasingFunctionForKeyPath:@"center"];
+                    }];
                 } else {
-                    if (type&tType_hour) {
-                        if (date.hour<12) {
-                            ampmW = [ampmLabelView changeText:@"오전"];
-                        } else {
-                            ampmW = [ampmLabelView changeText:@"오후"];
-                        }
-                        CGPoint targetPoint = CGPointMake(ampmX,
-                                                          hourLabelY-ampmLabelView.frame.size.height/2.f-ampmLabelView.frame.size.height*AMPM_EXTRAGAP_Y_RATE);
-                        [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
-                            [ampmLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
-                            ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                             ampmLabelView.frame.size.width,
-                                                             ampmLabelView.frame.size.height);
-                        } completion:^(BOOL finished) {
-                            [ampmLabelView removeEasingFunctionForKeyPath:@"center"];
-                        }];
-                    } else {
-                        ampmW = ampmLabelView.frame.size.width;
-                    }
+                    ampmW = ampmLabelView.frame.size.width;
                 }
             }
-            
-            
-            
-            if (hourInit) {
-                CGPoint targetPoint = CGPointMake(ampmX+ampmW-0.f, (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
-                hourLabelY = targetPoint.y+hourLabelView.frame.size.height/2.f;
-                //                hourLabelView.position = targetPoint;
-                hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                 hourLabelView.frame.size.width, hourLabelView.frame.size.height);
-            } else {
-                CGPoint targetPoint = CGPointMake(ampmX+ampmW-0.f, (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
-                hourLabelY = targetPoint.y+hourLabelView.frame.size.height/2.f;
-                [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
-                    [hourLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
-                    hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                     hourLabelView.frame.size.width, hourLabelView.frame.size.height);
-                } completion:^(BOOL finished) {
-                    [hourLabelView removeEasingFunctionForKeyPath:@"center"];
-                }];
-            }
-            
-            
         }
         
+        
+        
+        if (hourInit) {
+            CGPoint targetPoint = CGPointMake(ampmX+ampmW-0.f, (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
+            hourLabelY = targetPoint.y+hourLabelView.frame.size.height/2.f;
+            hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                             hourLabelView.frame.size.width, hourLabelView.frame.size.height);
+        } else {
+            CGPoint targetPoint = CGPointMake(ampmX+ampmW-0.f, (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
+            hourLabelY = targetPoint.y+hourLabelView.frame.size.height/2.f;
+            [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
+                [hourLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
+                hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                 hourLabelView.frame.size.width, hourLabelView.frame.size.height);
+            } completion:^(BOOL finished) {
+                [hourLabelView removeEasingFunctionForKeyPath:@"center"];
+            }];
+        }
+        
+        
     }
-    
-    
-    
-    
-    //winSize.width-PORTRAIT_STANDARD_X_GAP-secondW-SECOND_PORTRAIT_EXTRA_GAP,
-    {
         
-        // Minute & Second
-        float minuteW = 0.f;
-        float secondW = 0.f;
-        float minuteY = 0.f;
+    
+    
+    
+    
+    
+    
         
-        
-        if (![[RoationController shared] isLandscape]) {
-            if (!minuteLabelView) {
-                minuteLabelView = [[AMLabelView alloc] initWithFontName:FONT_LIGHT fontSize:MINUTE_FONTSIZE*SCREENRATE];
-                [rotateView addSubview:minuteLabelView];
+    // Minute & Second
+    float minuteW = 0.f;
+    float secondW = 0.f;
+    float minuteY = 0.f;
+    
+    
+    if (![[RoationController shared] isLandscape]) {
+        if (!minuteLabelView) {
+            minuteLabelView = [[AMLabelView alloc] initWithFontName:FONT_LIGHT fontSize:MINUTE_FONTSIZE*SCREENRATE];
+            [rotateView addSubview:minuteLabelView];
+            minuteW = [minuteLabelView changeText:[NSString stringWithFormat:@"%@분", [converter hangulWithTime:date.minute timeType:tcType_minute]]];
+            CGPoint targetPoint = CGPointMake(winSize.width-PORTRAIT_STANDARD_X_GAP-minuteW -MINUTE_PORTRAIT_EXTRA_GAP,
+                                              hourLabelY+(minuteLabelView.frame.size.height/2.f)*1.07f);
+            minuteY = targetPoint.y+minuteLabelView.frame.size.height/2.f;
+            minuteLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                               minuteLabelView.frame.size.width, minuteLabelView.frame.size.height);
+        } else {
+            if (type&tType_minute) {
                 minuteW = [minuteLabelView changeText:[NSString stringWithFormat:@"%@분", [converter hangulWithTime:date.minute timeType:tcType_minute]]];
                 CGPoint targetPoint = CGPointMake(winSize.width-PORTRAIT_STANDARD_X_GAP-minuteW -MINUTE_PORTRAIT_EXTRA_GAP,
                                                   hourLabelY+(minuteLabelView.frame.size.height/2.f)*1.07f);
                 minuteY = targetPoint.y+minuteLabelView.frame.size.height/2.f;
-                //                minuteLabelView.position = targetPoint;
-                minuteLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                   minuteLabelView.frame.size.width, minuteLabelView.frame.size.height);
+
+                [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
+                    [minuteLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
+                    minuteLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                       minuteLabelView.frame.size.width,
+                                                       minuteLabelView.frame.size.height);
+                } completion:^(BOOL finished) {
+                    [minuteLabelView removeEasingFunctionForKeyPath:@"center"];
+                }];
             } else {
-                if (type&tType_minute) {
-                    minuteW = [minuteLabelView changeText:[NSString stringWithFormat:@"%@분", [converter hangulWithTime:date.minute timeType:tcType_minute]]];
-                    CGPoint targetPoint = CGPointMake(winSize.width-PORTRAIT_STANDARD_X_GAP-minuteW -MINUTE_PORTRAIT_EXTRA_GAP,
-                                                      hourLabelY+(minuteLabelView.frame.size.height/2.f)*1.07f);
-                    minuteY = targetPoint.y+minuteLabelView.frame.size.height/2.f;
-                    //                    CCActionInterval *eMoveTo = EASEOUT_ACTION([CCMoveTo actionWithDuration:ANI_TEXT_DELAY position:targetPoint]);
-                    //                    eMoveTo.tag = TAG_ACTION_MOVETO;
-                    //                    if ([minuteLabelView numberOfRunningActions]) [minuteLabelView stopActionByTag:TAG_ACTION_MOVETO];
-                    //                    [minuteLabelView runAction:eMoveTo];
-                    [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
-                        [minuteLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
-                        minuteLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                           minuteLabelView.frame.size.width,
-                                                           minuteLabelView.frame.size.height);
-                    } completion:^(BOOL finished) {
-                        [minuteLabelView removeEasingFunctionForKeyPath:@"center"];
-                    }];
-                } else {
-                    minuteY = minuteLabelView.frame.origin.y+minuteLabelView.frame.size.height/2.f;
-                }
-            }
-            
-            
-            
-            if (![OptionController shared].secondOff) {
-                if (!secondLabelView) {
-                    secondLabelView = [[AMLabelView alloc] initWithFontName:FONT_NORMAL fontSize:SECOND_FONTSIZE*SCREENRATE];
-                    [secondLabelView setLabelCount:4];
-                    [rotateView addSubview:secondLabelView];
-                    
-                    secondW = [secondLabelView changeText:[NSString stringWithFormat:@"%@초", [converter hangulWithTime:date.second timeType:tcType_minute]]];
-                    CGPoint targetPoint = CGPointMake(winSize.width-PORTRAIT_STANDARD_X_GAP-secondW-SECOND_PORTRAIT_EXTRA_GAP,
-                                                      minuteY+(secondLabelView.frame.size.height)-SECOND_PORTRAIT_STANDARD_Y_GAP);
-                    secondLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                       secondLabelView.frame.size.width,
-                                                       secondLabelView.frame.size.height);
-                } else {
-                    if (type&tType_second) {
-                        secondW = [secondLabelView changeText:[NSString stringWithFormat:@"%@초", [converter hangulWithTime:date.second timeType:tcType_minute]]];
-                        CGPoint targetPoint = CGPointMake(winSize.width-PORTRAIT_STANDARD_X_GAP-secondW-SECOND_PORTRAIT_EXTRA_GAP,
-                                                          minuteY+(secondLabelView.frame.size.height)-SECOND_PORTRAIT_STANDARD_Y_GAP);
-                        //                        CCActionInterval *eMoveTo = EASEOUT_ACTION([CCMoveTo actionWithDuration:ANI_TEXT_DELAY position:targetPoint]);
-                        //                        eMoveTo.tag = TAG_ACTION_MOVETO;
-                        //                        if ([secondLabelView numberOfRunningActions]) [secondLabelView stopActionByTag:TAG_ACTION_MOVETO];
-                        //                        [secondLabelView runAction:eMoveTo];
-                        [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
-                            [secondLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
-                            secondLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                               secondLabelView.frame.size.width,
-                                                               secondLabelView.frame.size.height);
-                        } completion:^(BOOL finished) {
-                            [secondLabelView removeEasingFunctionForKeyPath:@"center"];
-                        }];
-                    }
-                }
-                
-            }
-        } else {
-            if (!minuteLabelView) {
-                minuteLabelView = [[AMLabelView alloc] initWithFontName:FONT_LIGHT fontSize:MINUTE_FONTSIZE*SCREENRATE];
-                [rotateView addSubview:minuteLabelView];
-                minuteW = [minuteLabelView changeText:[NSString stringWithFormat:@"%@분", [converter hangulWithTime:date.minute timeType:tcType_minute]]];
-                CGPoint targetPoint = CGPointMake(winSize.width-LANDSCAPE_STANDARD_MIN_X_GAP-minuteW ,
-                                                  hourLabelY+(minuteLabelView.frame.size.height/2.f)*1.37f);
-                minuteY = targetPoint.y+minuteLabelView.frame.size.height/2.f;
-                //                minuteLabelView.position = targetPoint;
-                minuteLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                   minuteLabelView.frame.size.width,
-                                                   minuteLabelView.frame.size.height);
-            } else {
-                if (type&tType_minute) {
-                    minuteW = [minuteLabelView changeText:[NSString stringWithFormat:@"%@분", [converter hangulWithTime:date.minute timeType:tcType_minute]]];
-                    CGPoint targetPoint = CGPointMake(winSize.width-LANDSCAPE_STANDARD_MIN_X_GAP-minuteW ,
-                                                      hourLabelY+(minuteLabelView.frame.size.height/2.f)*1.37f);
-                    minuteY = targetPoint.y+minuteLabelView.frame.size.height/2.f;
-                    //                    CCActionInterval *eMoveTo = EASEOUT_ACTION([CCMoveTo actionWithDuration:ANI_TEXT_DELAY position:targetPoint]);
-                    //                    eMoveTo.tag = TAG_ACTION_MOVETO;
-                    //                    if ([minuteLabelView numberOfRunningActions]) [minuteLabelView stopActionByTag:TAG_ACTION_MOVETO];
-                    //                    [minuteLabelView runAction:eMoveTo];
-                    [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
-                        [minuteLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
-                        minuteLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                           minuteLabelView.frame.size.width,
-                                                           minuteLabelView.frame.size.height);
-                    } completion:^(BOOL finished) {
-                        [minuteLabelView removeEasingFunctionForKeyPath:@"center"];
-                    }];
-                } else {
-                    minuteY = minuteLabelView.frame.origin.y+minuteLabelView.frame.size.height/2.f;
-                }
-            }
-            
-            
-            
-            if (![OptionController shared].secondOff) {
-                if (!secondLabelView) {
-                    secondLabelView = [[AMLabelView alloc] initWithFontName:FONT_NORMAL fontSize:SECOND_FONTSIZE*SCREENRATE];
-                    [secondLabelView setLabelCount:4];
-                    [rotateView addSubview:secondLabelView];
-                    
-                    secondW = [secondLabelView changeText:[NSString stringWithFormat:@"%@초", [converter hangulWithTime:date.second timeType:tcType_minute]]];
-                    CGPoint targetPoint = CGPointMake(winSize.width-LANDSCAPE_STANDARD_MIN_X_GAP+SECOND_LANDSCAPE_X,
-                                                      minuteY-(secondLabelView.frame.size.height/2.f)-LANDSCAPE_STANDARD_MIN_Y_GAP);
-                    //                    secondLabelView.position = targetPoint;
-                    secondLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                       secondLabelView.frame.size.width,
-                                                       secondLabelView.frame.size.height);
-                } else {
-                    if (type&tType_second) {
-                        secondW = [secondLabelView changeText:[NSString stringWithFormat:@"%@초", [converter hangulWithTime:date.second timeType:tcType_minute]]];
-                        CGPoint targetPoint = CGPointMake(winSize.width-LANDSCAPE_STANDARD_MIN_X_GAP+SECOND_LANDSCAPE_X,
-                                                          minuteY-(secondLabelView.frame.size.height/2.f)-LANDSCAPE_STANDARD_MIN_Y_GAP);
-                        //                        CCActionInterval *eMoveTo = EASEOUT_ACTION([CCMoveTo actionWithDuration:ANI_TEXT_DELAY position:targetPoint]);
-                        //                        eMoveTo.tag = TAG_ACTION_MOVETO;
-                        //                        if ([secondLabelView numberOfRunningActions]) [secondLabelView stopActionByTag:TAG_ACTION_MOVETO];
-                        //                        [secondLabelView runAction:eMoveTo];
-                        [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
-                            [secondLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
-                            secondLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                               secondLabelView.frame.size.width,
-                                                               secondLabelView.frame.size.height);
-                        } completion:^(BOOL finished) {
-                            [secondLabelView removeEasingFunctionForKeyPath:@"center"];
-                        }];
-                    }
-                }
-                
+                minuteY = minuteLabelView.frame.origin.y+minuteLabelView.frame.size.height/2.f;
             }
         }
         
         
         
+        if (![OptionController shared].secondOff) {
+            if (!secondLabelView) {
+                secondLabelView = [[AMLabelView alloc] initWithFontName:FONT_NORMAL fontSize:SECOND_FONTSIZE*SCREENRATE];
+                [secondLabelView setLabelCount:4];
+                [rotateView addSubview:secondLabelView];
+                
+                secondW = [secondLabelView changeText:[NSString stringWithFormat:@"%@초", [converter hangulWithTime:date.second timeType:tcType_minute]]];
+                CGPoint targetPoint = CGPointMake(winSize.width-PORTRAIT_STANDARD_X_GAP-secondW-SECOND_PORTRAIT_EXTRA_GAP,
+                                                  minuteY+(secondLabelView.frame.size.height)-SECOND_PORTRAIT_STANDARD_Y_GAP);
+                secondLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                   secondLabelView.frame.size.width,
+                                                   secondLabelView.frame.size.height);
+            } else {
+                if (type&tType_second) {
+                    secondW = [secondLabelView changeText:[NSString stringWithFormat:@"%@초", [converter hangulWithTime:date.second timeType:tcType_minute]]];
+                    CGPoint targetPoint = CGPointMake(winSize.width-PORTRAIT_STANDARD_X_GAP-secondW-SECOND_PORTRAIT_EXTRA_GAP,
+                                                      minuteY+(secondLabelView.frame.size.height)-SECOND_PORTRAIT_STANDARD_Y_GAP);
+                    
+                    [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
+                        [secondLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
+                        secondLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                           secondLabelView.frame.size.width,
+                                                           secondLabelView.frame.size.height);
+                    } completion:^(BOOL finished) {
+                        [secondLabelView removeEasingFunctionForKeyPath:@"center"];
+                    }];
+                }
+            }
+            
+        }
+    } else {
+        if (!minuteLabelView) {
+            minuteLabelView = [[AMLabelView alloc] initWithFontName:FONT_LIGHT fontSize:MINUTE_FONTSIZE*SCREENRATE];
+            [rotateView addSubview:minuteLabelView];
+            minuteW = [minuteLabelView changeText:[NSString stringWithFormat:@"%@분", [converter hangulWithTime:date.minute timeType:tcType_minute]]];
+            CGPoint targetPoint = CGPointMake(winSize.width-LANDSCAPE_STANDARD_MIN_X_GAP-minuteW ,
+                                              hourLabelY+(minuteLabelView.frame.size.height/2.f)*1.37f);
+            minuteY = targetPoint.y+minuteLabelView.frame.size.height/2.f;
+            minuteLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                               minuteLabelView.frame.size.width,
+                                               minuteLabelView.frame.size.height);
+        } else {
+            if (type&tType_minute) {
+                minuteW = [minuteLabelView changeText:[NSString stringWithFormat:@"%@분", [converter hangulWithTime:date.minute timeType:tcType_minute]]];
+                CGPoint targetPoint = CGPointMake(winSize.width-LANDSCAPE_STANDARD_MIN_X_GAP-minuteW ,
+                                                  hourLabelY+(minuteLabelView.frame.size.height/2.f)*1.37f);
+                minuteY = targetPoint.y+minuteLabelView.frame.size.height/2.f;
+                
+                [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
+                    [minuteLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
+                    minuteLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                       minuteLabelView.frame.size.width,
+                                                       minuteLabelView.frame.size.height);
+                } completion:^(BOOL finished) {
+                    [minuteLabelView removeEasingFunctionForKeyPath:@"center"];
+                }];
+            } else {
+                minuteY = minuteLabelView.frame.origin.y+minuteLabelView.frame.size.height/2.f;
+            }
+        }
+        
+        
+        
+        if (![OptionController shared].secondOff) {
+            if (!secondLabelView) {
+                secondLabelView = [[AMLabelView alloc] initWithFontName:FONT_NORMAL fontSize:SECOND_FONTSIZE*SCREENRATE];
+                [secondLabelView setLabelCount:4];
+                [rotateView addSubview:secondLabelView];
+                
+                secondW = [secondLabelView changeText:[NSString stringWithFormat:@"%@초", [converter hangulWithTime:date.second timeType:tcType_minute]]];
+                CGPoint targetPoint = CGPointMake(winSize.width-LANDSCAPE_STANDARD_MIN_X_GAP+SECOND_LANDSCAPE_X,
+                                                  minuteY-(secondLabelView.frame.size.height/2.f)-LANDSCAPE_STANDARD_MIN_Y_GAP);
+                secondLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                   secondLabelView.frame.size.width,
+                                                   secondLabelView.frame.size.height);
+            } else {
+                if (type&tType_second) {
+                    secondW = [secondLabelView changeText:[NSString stringWithFormat:@"%@초", [converter hangulWithTime:date.second timeType:tcType_minute]]];
+                    CGPoint targetPoint = CGPointMake(winSize.width-LANDSCAPE_STANDARD_MIN_X_GAP+SECOND_LANDSCAPE_X,
+                                                      minuteY-(secondLabelView.frame.size.height/2.f)-LANDSCAPE_STANDARD_MIN_Y_GAP);
+                    
+                    [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
+                        [secondLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
+                        secondLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                                           secondLabelView.frame.size.width,
+                                                           secondLabelView.frame.size.height);
+                    } completion:^(BOOL finished) {
+                        [secondLabelView removeEasingFunctionForKeyPath:@"center"];
+                    }];
+                }
+            }
+        } // end of if (![OptionController shared].secondOff) {
+        
+        
     }
+    
     
     
     
@@ -649,35 +598,6 @@
     
     if (!timeLabelInit) {
         timeLabelInit = YES;
-        
-        /*
-         //
-         //
-         // 시간 세팅
-         hourLabelView = [[AMLabelView alloc] initWithFontName:FONT_EXTRABOLD fontSize:200];
-         if (date.hour%12==0) {
-         [hourLabelView changeText:[NSString stringWithFormat:@"%@시", [converter hangulWithTime:12 timeType:tcType_hour]]];
-         } else {
-         [hourLabelView changeText:[NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%12 timeType:tcType_hour]]];
-         }
-         CGPoint hTargetPoint = [self getHourPoint];
-         hourLabelView.position = hTargetPoint;
-         [rotateView addSubview:hourLabelView];
-         
-         minuteLabelView = [[AMLabelView alloc] initWithFontName:@FONT_LIGHT fontSize:80];
-         [minuteLabelView changeText:[NSString stringWithFormat:@"%@분", [converter hangulWithTime:date.minute timeType:tcType_minute]]];
-         
-         CGPoint mTargetPoint = [self getMinutPointWithHourPoint:hTargetPoint];
-         minuteLabelView.position = mTargetPoint;
-         [rotateView addSubview:minuteLabelView];
-         
-         secondLabelView = [[AMLabelView alloc] initWithFontName:FONT_NORMAL fontSize:18];
-         [secondLabelView changeText:[NSString stringWithFormat:@"%@초", [converter hangulWithTime:date.second timeType:tcType_minute]]];
-         [secondLabelView setLabelCount:4];
-         CGPoint sTargetPoint = [self getSecondPointWithHourPoint:hTargetPoint minutePoint:mTargetPoint];
-         secondLabelView.position = sTargetPoint;
-         [rotateView addSubview:secondLabelView];
-         */
         
         
         
@@ -780,44 +700,16 @@
     
     
     
-    /*if (type&tType_hour) {
-     if (date.hour%12==0) {
-     [hourLabelView changeText:[NSString stringWithFormat:@"%@시", [converter hangulWithTime:12 timeType:tcType_hour]]];
-     } else {
-     [hourLabelView changeText:[NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%12 timeType:tcType_hour]]];
-     }
-     hTargetPoint = [self getHourPoint];
-     }
-     if (type&tType_minute) {
-     NSLog(@"1minuteLabelView.contentsize:%@", NSStringFromCGSize(minuteLabelView.contentSize));
-     [minuteLabelView changeText:[NSString stringWithFormat:@"%@분", [converter hangulWithTime:date.minute timeType:tcType_minute]]];
-     NSLog(@"2minuteLabelView.contentsize:%@", NSStringFromCGSize(minuteLabelView.contentSize));
-     if (!nowRotateAnimate) {
-     mTargetPoint = [self getMinutPointWithHourPoint:hTargetPoint];
-     [minuteLabelView runAction:EASEOUT_ACTION([CCMoveTo actionWithDuration:ANI_TEXT_DELAY position:mTargetPoint])];
-     }
-     
-     }
-     if (type&tType_second) {
-     [secondLabelView changeTextWithOutAnimation:[NSString stringWithFormat:@"%@초", [converter hangulWithTime:date.second timeType:tcType_minute]]];
-     if (!nowRotateAnimate) {
-     sTargetPoint = [self getSecondPointWithHourPoint:hTargetPoint minutePoint:mTargetPoint];
-     [secondLabelView runAction:EASEOUT_ACTION([CCMoveTo actionWithDuration:ANI_TEXT_DELAY position:sTargetPoint])];
-     }
-     }*/
-    
 }
 
 
 
 #pragma mark - 화면 회전
 - (BOOL)shouldAutorotate {
-    //    NSLog(@"%zd-self.view.frame:%@", [[UIApplication sharedApplication] statusBarOrientation], NSStringFromCGRect(self.view.frame));
     [self setWinsize];
     mainTouchView.winSize = winSize;
     
     [RoationController shared].statusBarOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-    
     
     return YES;
 }
@@ -831,13 +723,7 @@
     [UIView animateWithDuration:ROTATION_DELAY_TIME delay:0 options:UIViewAnimationOptionTransitionNone animations:^{
         portraitBackgroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.height);
         portraitBackgroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.height);
-        if ([RoationController shared].isLandscape) {
-            //            bgImageView_p.alpha = 0;
-            landscapeBackgroundImageView.alpha = 1;
-        } else {
-            //            bgImageView_p.alpha = 1;
-            landscapeBackgroundImageView.alpha = 0;
-        }
+        landscapeBackgroundImageView.alpha = [RoationController shared].isLandscape ? 1 : 0;
     } completion:nil];
     
     
@@ -898,20 +784,15 @@
                                         minuteY-(secondLabelView.frame.size.height/2.f)+7.f);
     }
     
-//    minuteY+(secondLabelView.frame.size.height)-4.f
     
     
     [UIView animateWithDuration:ROTATION_DELAY_TIME delay:0 options:UIViewAnimationOptionTransitionNone animations:^{
-        //        [self rotationMoveToAnimtionWithView:hourLabelView point:hourTargetPoint];
-        //        [self rotationMoveToAnimtionWithView:minuteLabelView point:minutTargetPoint];
         hourLabelView.frame = CGRectMake(hourTargetPoint.x, hourTargetPoint.y, hourLabelView.frame.size.width, hourLabelView.frame.size.height);
         minuteLabelView.frame = CGRectMake(minutTargetPoint.x, minutTargetPoint.y, minuteLabelView.frame.size.width, minuteLabelView.frame.size.height);
         if (![OptionController shared].ampmOff) {
-            //            [self rotationMoveToAnimtionWithView:ampmLabelView point:ampmTargetPoint];
             ampmLabelView.frame = CGRectMake(ampmTargetPoint.x, ampmTargetPoint.y, ampmLabelView.frame.size.width, ampmLabelView.frame.size.height);
         }
         if (![OptionController shared].secondOff) {
-            //            [self rotationMoveToAnimtionWithView:secondLabelView point:secondTargetPoint];
             secondLabelView.frame = CGRectMake(secondTargetPoint.x, secondTargetPoint.y, secondLabelView.frame.size.width, secondLabelView.frame.size.height);
         }
     } completion:^(BOOL finished) {
@@ -947,16 +828,7 @@
         menuView.mainViewController = self;
         [self.view addSubview:menuView];
         mainTouchView.menuView = menuView;
-        NSLog(@"menuView:%@", menuView);
     }
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    
-    
-    
-    
-    
 }
 
 
@@ -1025,6 +897,8 @@
         [yeardateLabelView changeTextArray:@[yearString, monthString, dayString, weekString]];
     }
 }
+
+
 - (void)setAmpmOff:(BOOL)ampmOff {
     
     
@@ -1046,4 +920,6 @@
     NSDate *date = [NSDate date];
     [self timeChanged:date changeType:type];
 }
+
+
 @end
