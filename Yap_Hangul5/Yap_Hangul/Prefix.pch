@@ -11,7 +11,7 @@
 
 #ifdef __OBJC__
 
-#define DEBUG 0
+//#define DEBUG 1
 
 //#import "RoationController.h"
 //#import "LoadingController.h"
@@ -22,8 +22,12 @@
 
 #import "OptionController.h"
 
-
+#if DEBUG
+#define DEBUG_START_DATE [NSDate dateWithYear:2018 month:10 day:10 hour:12 minute:59 second:4]
+#else
 #define DEBUG_START_DATE nil//[NSDate dateWithYear:2014 month:10 day:10 hour:12 minute:59 second:4]
+#endif
+
 #define ROTATE_EASE(action) [CCEaseInOut actionWithAction:action rate:3.f]
 
 
