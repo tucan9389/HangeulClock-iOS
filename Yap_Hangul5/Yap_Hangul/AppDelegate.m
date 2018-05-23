@@ -40,7 +40,7 @@
     [tracker send:[[GAIDictionaryBuilder createAppView] build]];
     
     
-    
+    /*
     NSArray *familyNames = [[NSArray alloc] initWithArray:[UIFont familyNames]];
     NSArray *fontNames;
     NSInteger indFamily, indFont;
@@ -53,6 +53,7 @@
             NSLog(@"    Font name: %@", [fontNames objectAtIndex:indFont]);
         }
     }
+     */
     
     
     

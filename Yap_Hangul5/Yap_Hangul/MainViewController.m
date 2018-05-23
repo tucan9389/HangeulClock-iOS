@@ -97,15 +97,7 @@
     
     
     
-    winSize = CGSizeMake((self.view.frame.size.width>self.view.frame.size.height)?self.view.frame.size.width:self.view.frame.size.height, (self.view.frame.size.height<self.view.frame.size.width)?self.view.frame.size.height:self.view.frame.size.width);
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    if (!(orientation==UIInterfaceOrientationLandscapeLeft ||
-        orientation==UIInterfaceOrientationLandscapeRight)) {
-        winSize = CGSizeMake(winSize.height, winSize.width);
-    }
-//    winSize = self.view.frame.size;//[CCDirector sharedDirector].winSize;
-    //    [RoationController shared].rootOrientation = [[UIDevice currentDevice] orientation];
-    //    defaultAngle = [[RoationController shared] degreeWithOrientation:[[UIDevice currentDevice] orientation]]*90;
+    [self setWinsize];
     
     self.view.backgroundColor = [UIColor blackColor];
     [self makeBackgroundImageView];
@@ -125,12 +117,29 @@
     
     [OptionController shared].mainViewController = self;
     //        NSLog(@"%@", [UIFont fontNamesForFamilyName:FONT_NORMAL]);
-    NSLog(@"view did load");
+//    NSLog(@"view did load");
     
     
     
     //    [[RoationController shared].delegateArray addObject:self];
     
+}
+
+- (void)setWinsize {
+    
+    
+    winSize = CGSizeMake((self.view.frame.size.width>self.view.frame.size.height)?self.view.frame.size.width:self.view.frame.size.height, (self.view.frame.size.height<self.view.frame.size.width)?self.view.frame.size.height:self.view.frame.size.width);
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    
+    if (!(orientation==UIInterfaceOrientationLandscapeLeft ||
+          orientation==UIInterfaceOrientationLandscapeRight)) {
+        winSize = CGSizeMake(winSize.height, winSize.width);
+    }
+    
+    if (@available(iOS 11.0, *)) {
+//        NSLog(@"topPadding: %f", self.topLayoutGuide.length);
+        winSize = CGSizeMake(winSize.width, winSize.height - self.topLayoutGuide.length - self.bottomLayoutGuide.length);
+    }
 }
 
 
@@ -144,29 +153,26 @@
     NSString *landscapeBackgroundImageName = nil;
     
     if (ISIPAD) {
-        portraitBackgroundImageName = @"LaunchImage-700-Portrait~ipad";
-        landscapeBackgroundImageName = @"LaunchImage-700-Landscape~ipad";
+        portraitBackgroundImageName = @"BG-ipad-portrait";
+        landscapeBackgroundImageName = @"BG-ipad-landscape";
     } else {
-        portraitBackgroundImageName = @"LaunchImage-800-667h@2x.png";
-        landscapeBackgroundImageName = @"LaunchImage-Landscape";
+        portraitBackgroundImageName = @"BG-iphone";
+        landscapeBackgroundImageName = @"BG-iphone";
     }
     
     UIImage *portraitBackgroundImage = [UIImage imageNamed:portraitBackgroundImageName];
     portraitBackgroundImageView = [[UIImageView alloc] initWithImage:portraitBackgroundImage];
-    portraitBackgroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.width *(portraitBackgroundImage.size.height / portraitBackgroundImage.size.width));
+    portraitBackgroundImageView.frame = CGRectMake(0, 0, winSize.width, winSize.height);
     [self.view addSubview:portraitBackgroundImageView];
     
     UIImage *landscapeBackGroundImage = [UIImage imageNamed:landscapeBackgroundImageName];
     landscapeBackgroundImageView = [[UIImageView alloc] initWithImage:landscapeBackGroundImage];
-    landscapeBackgroundImageView.frame = CGRectMake(0, 0, winSize.width * (landscapeBackGroundImage.size.width / landscapeBackGroundImage.size.height), winSize.width);
+    landscapeBackgroundImageView.frame = CGRectMake(0, 0, winSize.height, winSize.width);
     [self.view addSubview:landscapeBackgroundImageView];
     
-    if ([self isHorizontal]) {
-        landscapeBackgroundImageView.alpha = 1;
-    }
-    else {
-        landscapeBackgroundImageView.alpha = 0;
-    }
+    
+    landscapeBackgroundImageView.alpha = [self isHorizontal] ? 1 : 0;
+    portraitBackgroundImageView.alpha = [self isHorizontal] ? 0 : 1;
 }
 
 - (BOOL)isHorizontal {
@@ -344,7 +350,7 @@
                                                       hourLabelY-ampmLabelView.frame.size.height/2.f-ampmLabelView.frame.size.height*AMPM_EXTRAGAP_Y_RATE);
                     ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
                                                      ampmLabelView.frame.size.width, ampmLabelView.frame.size.height);
-                    NSLog(@"ampmLabelView.frame:%@", NSStringFromCGRect(ampmLabelView.frame));
+//                    NSLog(@"ampmLabelView.frame:%@", NSStringFromCGRect(ampmLabelView.frame));
                 } else {
                     if (type&tType_hour) {
                         if (date.hour<12) {
@@ -807,12 +813,7 @@
 #pragma mark - 화면 회전
 - (BOOL)shouldAutorotate {
     //    NSLog(@"%zd-self.view.frame:%@", [[UIApplication sharedApplication] statusBarOrientation], NSStringFromCGRect(self.view.frame));
-    winSize = CGSizeMake((self.view.frame.size.width>self.view.frame.size.height)?self.view.frame.size.width:self.view.frame.size.height, (self.view.frame.size.height<self.view.frame.size.width)?self.view.frame.size.height:self.view.frame.size.width);
-    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-    if (!(orientation==UIInterfaceOrientationLandscapeLeft ||
-          orientation==UIInterfaceOrientationLandscapeRight)) {
-        winSize = CGSizeMake(winSize.height, winSize.width);
-    }
+    [self setWinsize];
     mainTouchView.winSize = winSize;
     
     [RoationController shared].statusBarOrientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -822,10 +823,7 @@
 }
 #pragma mark - 실제 화면 회전시
 - (void) realRotateScreen {
-    winSize = CGSizeMake((self.view.frame.size.width>self.view.frame.size.height)?self.view.frame.size.width:self.view.frame.size.height, (self.view.frame.size.height<self.view.frame.size.width)?self.view.frame.size.height:self.view.frame.size.width);
-    if (![RoationController shared].isLandscape) {
-        winSize = CGSizeMake(winSize.height, winSize.width);
-    }
+    [self setWinsize];
     mainTouchView.winSize = winSize;
     
     
@@ -847,11 +845,6 @@
     
     if (![OptionController shared].dateOff) {
         if (yeardateLabelView) {
-            //            CCMoveTo *moveTo = [CCMoveTo actionWithDuration:ROTATION_DELAY_TIME position:CGPointMake(TOP_YEAR_GAP, YEAR_POS_Y)];
-            //            CCActionInterval *eMoveTo = ROTATE_EASE(moveTo);
-            //            eMoveTo.tag = TAG_ACTION_MOVETO;
-            //            if ([yeardateLabelView numberOfRunningActions]) [yeardateLabelView stopActionByTag:TAG_ACTION_MOVETO];
-            //            [yeardateLabelView runAction:eMoveTo];
             [UIView animateWithDuration:ROTATION_DELAY_TIME delay:0 options:UIViewAnimationOptionTransitionNone animations:^{
                 yeardateLabelView.frame = CGRectMake(TOP_YEAR_GAP, YEAR_POS_Y,
                                                      yeardateLabelView.frame.size.width,
