@@ -128,12 +128,6 @@
     }
 }
 
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 - (void)makeBackgroundImageView {
     NSString *portraitBackgroundImageName = nil;
     NSString *landscapeBackgroundImageName = nil;
@@ -160,6 +154,16 @@
     landscapeBackgroundImageView.alpha = [self isHorizontal] ? 1 : 0;
     portraitBackgroundImageView.alpha = [self isHorizontal] ? 0 : 1;
 }
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+
+
+
 
 - (BOOL)isHorizontal {
     return [[UIApplication sharedApplication] statusBarOrientation] == UIDeviceOrientationLandscapeRight ||
@@ -211,11 +215,15 @@
 
 
 #pragma mark - Time Engine Delegate
-- (void) timeWillChange:(NSDate *)date changeType:(enum TimeChangeType)type afterInterval:(float)afterT {
+- (void) timeWillChange:(NSDate *)date
+             changeType:(enum TimeChangeType)type
+          afterInterval:(float)afterT { /* ... */ }
+
+
+- (void) timeChanged:(NSDate *)date
+          changeType:(enum TimeChangeType)type {
     
-}
-- (void) timeChanged:(NSDate *)date changeType:(enum TimeChangeType)type {
-    
+    // 최상단에 년, 월, 일, 요일 펼쳐져있는 레이블 세팅
     if (![OptionController shared].dateOff) {
         if (!yeardateLabelView) {
             float width = (![[RoationController shared] isLandscape])?(winSize.width):(winSize.height);
@@ -228,19 +236,11 @@
             [rotateView addSubview:yeardateLabelView];
         }
         
-        
-        if (type&tType_day || type&tType_month || type&tType_year) {
-            NSString *yearString = [NSString stringWithFormat:@"%@년", [converter hangulWithTime:date.year timeType:tcType_minute]];
-            NSString *monthString = [NSString stringWithFormat:@"%@월", [converter hangulWithTime:date.month timeType:tcType_month]];
-            NSString *dayString = [NSString stringWithFormat:@"%@일", [converter hangulWithTime:date.day timeType:tcType_minute]];
-            NSString *weekString = [converter weekHanhulWithIndex:date.weekday];
-            
-            [yeardateLabelView changeTextArray:@[yearString, monthString, dayString, weekString]];
-        }
+        [self setTopLabelWithDate:date changeType:type label:yeardateLabelView];
     }
     
     
-    
+    // 이놈의 전역변수같은 지역변수 때문에 고생하네...
     float hourLabelX = 0.f;
     float hourLabelW = 0.f;
     float hourLabelY = 0.f;
@@ -248,62 +248,41 @@
         
     if (![[RoationController shared] isLandscape]) {
         
+        // 시간 레이블 설정(없을시 만들기)
         if (!hourLabelView) {
             hourLabelView = [[AMLabelView alloc] initWithFontName:FONT_EXTRABOLD fontSize:HOUR_FONTSIZE*SCREENRATE];
-            NSString *hourText = nil;
-            if (![OptionController shared].ampmOff) {
-                if (date.hour%12==0) {
-                    hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:12 timeType:tcType_hour]];
-                } else {
-                    hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%12 timeType:tcType_hour]];
-                }
-            } else {
-                hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%24 timeType:tcType_hour]];
-            }
             
-            hourLabelW = [hourLabelView changeText:hourText];
+            [self setHourTextAndLabelFrameWithTime:date hourLabel:hourLabelView animated:false];
+            
+            // 시간 레이블 너비, 좌표 준비
+            hourLabelW = hourLabelView.frame.size.width;
             hourLabelX = winSize.width-PORTRAIT_STANDARD_X_GAP-hourLabelW;
             CGPoint targetPoint = CGPointMake(hourLabelX ,
                                               (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
             hourLabelY = targetPoint.y+hourLabelView.frame.size.height/2.f;
-            hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y, hourLabelView.frame.size.width, hourLabelView.frame.size.height);
+            
+            // 시간 레이블 rotateView 위에 올리기
             [rotateView addSubview:hourLabelView];
         } else {
             if (type&tType_hour) {
-                NSString *hourText = nil;
-                if (![OptionController shared].ampmOff) {
-                    if (date.hour%12==0) {
-                        hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:12 timeType:tcType_hour]];
-                    } else {
-                        hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%12 timeType:tcType_hour]];
-                    }
-                } else {
-                    hourText = [NSString stringWithFormat:@"%@시", [converter hangulWithTime:date.hour%24 timeType:tcType_hour]];
-                }
+                [self setHourTextAndLabelFrameWithTime:date hourLabel:hourLabelView animated:true];
                 
-                hourLabelW = [hourLabelView changeText:hourText];
+                // 시간 레이블 너비, 좌표 준비
+                hourLabelW = hourLabelView.frame.size.width;
                 hourLabelX = winSize.width-PORTRAIT_STANDARD_X_GAP-hourLabelW;
-                CGPoint targetPoint = CGPointMake(hourLabelX , (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
+                CGPoint targetPoint = CGPointMake(hourLabelX ,
+                                                  (YEAR_POS_Y*2)+(hourLabelView.frame.size.height/2.f)*1.37f);
                 hourLabelY = targetPoint.y+hourLabelView.frame.size.height/2.f;
-                
-                [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
-                    [hourLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
-                    hourLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                     hourLabelView.frame.size.width,
-                                                     hourLabelView.frame.size.height);
-                } completion:^(BOOL finished) {
-                    [hourLabelView removeEasingFunctionForKeyPath:@"center"];
-                }];
             } else {
                 hourLabelX = hourLabelView.frame.origin.x;
                 hourLabelY = hourLabelView.frame.origin.y+hourLabelView.frame.size.height/2.f;
                 hourLabelW = hourLabelView.frame.size.width;
             }
             
-        }
+        } // end of if (!hourLabelView) {
         
         
-        
+        // 오전오후 레이블 설정(없을시 만들기)
         if (![OptionController shared].ampmOff) {
             if (!ampmLabelView) {
                 float ampmW = 0.f;
@@ -699,6 +678,62 @@
     
     
     
+}
+
+- (void) setTopLabelWithDate:(NSDate *)date
+                  changeType:(enum TimeChangeType)type
+                       label:(FWLabelView *)label {
+    
+    if (type&tType_day || type&tType_month || type&tType_year) {
+        NSString *yearString = [NSString stringWithFormat:@"%@년", [converter hangulWithTime:date.year timeType:tcType_minute]];
+        NSString *monthString = [NSString stringWithFormat:@"%@월", [converter hangulWithTime:date.month timeType:tcType_month]];
+        NSString *dayString = [NSString stringWithFormat:@"%@일", [converter hangulWithTime:date.day timeType:tcType_minute]];
+        NSString *weekString = [converter weekHanhulWithIndex:date.weekday];
+        
+        [label changeTextArray:@[yearString, monthString, dayString, weekString]];
+    }
+    
+}
+
+
+- (void) setHourTextAndLabelFrameWithTime:(NSDate *)date
+                                hourLabel:(AMLabelView *)hourLabel
+                                 animated:(BOOL) animated {
+    // 시간 텍스트 설정
+    NSString *hourText = nil;
+    NSString *text = nil;
+    if (![OptionController shared].ampmOff) {
+        if (date.hour%12==0) {
+            text = [converter hangulWithTime:12 timeType:tcType_hour];
+        } else {
+            text = [converter hangulWithTime:date.hour%12 timeType:tcType_hour];
+        }
+    } else {
+        text = [converter hangulWithTime:date.hour%24 timeType:tcType_hour];
+    }
+    hourText = [NSString stringWithFormat:@"%@시", text];
+    
+    // 시간 레이블 너비, 좌표 준비
+    CGFloat hourLabelW = [hourLabel changeText:hourText];
+    CGFloat hourLabelX = winSize.width-PORTRAIT_STANDARD_X_GAP-hourLabelW;
+    CGPoint targetPoint = CGPointMake(hourLabelX ,
+                                      (YEAR_POS_Y*2)+(hourLabel.frame.size.height/2.f)*1.37f);
+    
+    // 시간 레이블 frame 설정
+    if (animated) {
+        [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
+            [hourLabel setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
+            hourLabel.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                         hourLabel.frame.size.width,
+                                         hourLabel.frame.size.height);
+        } completion:^(BOOL finished) {
+            [hourLabel removeEasingFunctionForKeyPath:@"center"];
+        }];
+    } else {
+        hourLabel.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                     hourLabel.frame.size.width,
+                                     hourLabel.frame.size.height);
+    }
 }
 
 
