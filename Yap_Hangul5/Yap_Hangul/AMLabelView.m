@@ -246,13 +246,7 @@
         UILabel *removeLabel = actionInfoArray[i][OLD_LABEL];
         
         
-        //        NSLog(@"i=====:%i", i);
         if (newLabel) {
-            //            NSLog(@"new string : %@", newLabel.text);
-//            CCMoveTo *moveTo = [CCMoveTo actionWithDuration:aniDelayTime position:CGPointMake((float)i)*(newLabel.fontSize*LABEL_WIDTHRATE+self.labelGap), 0)];
-//            CCFadeTo *fadeTo = [CCFadeTo actionWithDuration:aniDelayTime opacity:255.f*1.f];
-//            CCActionInterval *action = [CCSpawn actions:EASEOUT_ACTION(moveTo), EASEOUT_ACTION(fadeTo), nil];
-//            [newLabel runAction:[CCSequence actions:[CCDelayTime actionWithDuration:startTime], action, nil]];
             [UIView animateWithDuration:aniDelayTime*.5f delay:startTime options:UIViewAnimationOptionTransitionNone animations:^{
                 newLabel.alpha = 1.f;
             } completion:nil];
@@ -269,13 +263,6 @@
             if (width<0.f) width = (i+1)*(self.fontSize*LABEL_WIDTHRATE+self.labelGap);
         }
         if (removeLabel) {
-            //            NSLog(@"remove string : %@", removeLabel.text);
-//            CCMoveTo *moveTo = [CCMoveTo actionWithDuration:aniDelayTime position:CGPointMake((float)i)*(removeLabel.fontSize*LABEL_WIDTHRATE+self.labelGap), -removeLabel.fontSize*LABEL_WIDTHRATE*.7f)];
-//            CCFadeTo *fadeTo = [CCFadeTo actionWithDuration:aniDelayTime opacity:0.f];
-//            CCActionInterval *action = [CCSpawn actions:EASEOUT_ACTION(moveTo), EASEOUT_ACTION(fadeTo), nil];
-//            [removeLabel runAction:[CCSequence actions:[CCDelayTime actionWithDuration:startTime], action, [CCCallBlock actionWithBlock:^{
-//                [self removeToWaitingWithLabel:removeLabel];
-//            }], nil]];
             [UIView animateWithDuration:aniDelayTime*.5f delay:startTime options:UIViewAnimationOptionTransitionNone animations:^{
                 removeLabel.alpha = 0;
             } completion:nil];
@@ -296,19 +283,12 @@
     }
     
     
-    
-//    if (0 && DEBUG) {
-//        if (!debugLayer) {
-//            debugLayer = [CCLayerColor layerWithColor:ccc4(255, 190, 190, .2f*255.f) width:width height:width/newStringArray.count];
-//            debugLayer.position = CGPointMake0, -debugLayer.frame.size.height/2.f);
-//            [self addSubview:debugLayer];
-//        }
-//        debugLayer.contentSize = CGSizeMake(width, debugLayer.frame.size.height);
-//    }
-    
     self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, width, self.fontSize/*width/newStringArray.count*/);
     if (width>0) return width-self.labelGap;
     else return width;
+}
+- (CGFloat) getWidth {
+    return self.frame.size.width;
 }
 - (UILabel *) getNewLabel {
     UILabel *l = nil;
