@@ -50,4 +50,11 @@
     CGSize winSize = [[UIScreen mainScreen] bounds].size;
     return (winSize.width<winSize.height)?winSize.height:winSize.width;
 }
+- (CGFloat) smallWidth {
+    CGSize winSize = [[UIScreen mainScreen] bounds].size;
+    return (winSize.width>winSize.height)?winSize.height:winSize.width;
+}
+- (CGFloat) whRate {
+    return [self smallWidth]/[self bigHeight];
+}
 @end

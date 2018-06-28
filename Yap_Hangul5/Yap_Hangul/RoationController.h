@@ -21,6 +21,8 @@
 @property(nonatomic) UIInterfaceOrientation statusBarOrientation;
 - (BOOL) isLandscape;
 - (CGFloat) bigHeight ;
+- (CGFloat) smallWidth ;
+- (CGFloat) whRate ;
 
 @property (nonatomic, retain) id <RotateDelegate> delegate;
 @end

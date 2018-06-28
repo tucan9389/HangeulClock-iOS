@@ -80,6 +80,7 @@
 		259192B019ED7C49008FCADA /* GAITrackedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAITrackedViewController.h; sourceTree = "<group>"; };
 		259192B119ED7C49008FCADA /* GAITracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GAITracker.h; sourceTree = "<group>"; };
 		259192B219ED7C49008FCADA /* libGoogleAnalyticsServices.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libGoogleAnalyticsServices.a; sourceTree = "<group>"; };
+		55026C9920E4B4780019BC1E /* Yap_Hangul-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Yap_Hangul-Bridging-Header.h"; sourceTree = "<group>"; };
 		55AD10731C020DC700A4F95C /* KakaoOpenSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = KakaoOpenSDK.framework; sourceTree = "<group>"; };
 		55AD10771C02127500A4F95C /* IMG_0062.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_0062.JPG; sourceTree = "<group>"; };
 		849BE14C19EB5AF100A42C1C /* Yap_Hangul5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Yap_Hangul5.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -337,6 +338,7 @@
 				849BE18519EB5B7C00A42C1C /* NSDate(Categories) */,
 				849BE19719EB5B7C00A42C1C /* TimeEngine.h */,
 				849BE19819EB5B7C00A42C1C /* TimeEngine.m */,
+				55026C9920E4B4780019BC1E /* Yap_Hangul-Bridging-Header.h */,
 			);
 			path = TimeEngine;
 			sourceTree = "<group>";
@@ -484,6 +486,7 @@
 					849BE14B19EB5AF100A42C1C = {
 						CreatedOnToolsVersion = 6.0.1;
 						DevelopmentTeam = 5WXJ4Z4H69;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.InAppPurchase = {
@@ -695,6 +698,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -716,6 +720,9 @@
 				PRODUCT_NAME = Yap_Hangul5;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Yap_Hangul/TimeEngine/Yap_Hangul-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -724,6 +731,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -734,6 +742,7 @@
 					"$(PROJECT_DIR)/Yap_Hangul/Extern",
 				);
 				GCC_PREFIX_HEADER = Yap_Hangul/Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = "DEBUG=0";
 				INFOPLIST_FILE = Yap_Hangul/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -745,6 +754,8 @@
 				PRODUCT_NAME = Yap_Hangul5;
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Yap_Hangul/TimeEngine/Yap_Hangul-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

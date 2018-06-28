@@ -45,18 +45,30 @@
     float defaultAngle;
     
     // rotateView위에 올라가있는 레이블 (:UIView)
+    // 상단에 길게 늘어져있는 "이 천 십 팔 년 시 월 이 십 사 일 화 요 일" 이런식으로 보여지는 레이블
     FWLabelView *yeardateLabelView;
     
+    // 실제 화면 상단에 나타나는 메인 한글 시계 레이블
+    // 시간 레이블
     AMLabelView *hourLabelView;
+    // 분 레이블
     AMLabelView *minuteLabelView;
+    // 초 레이블
     AMLabelView *secondLabelView;
     
+    // 오전오후 레이블
     AMLabelView *ampmLabelView;
     
+    
+    // 우측 하단에 연하게 한글을 펼쳐서 보여주는 레이블들
+    // 한글이 펼쳐진 오전오후 레이블
     UIEffectLabel *ampmEffectLabel;
+    // 한글이 펼쳐진 요일 레이블
     UIEffectLabel *weekDayEffectLabel;
     
+    // 한글이 펼쳐진 달 레이블
     UIEffectLabel *monthEffectLabel;
+    // 한글이 펼쳐진 년도 레이블
     UIEffectLabel *yearEffectLabel;
     
     BOOL nowRotateAnimate;
@@ -109,7 +121,8 @@
     mainTouchView.winSize = winSize;
     
     [OptionController shared].mainViewController = self;
-
+    
+    NSLog(@"[[RoationController shared] bigHeight]: %f", [[RoationController shared] bigHeight]);
 }
 
 - (void)setWinsize {
@@ -198,7 +211,12 @@
 #define SECOND_FONTSIZE ((ISIPAD)?(30):(20))
 #define AMPM_FONTSIZE ((ISIPAD)?(75):(30))
 
-#define SCREENRATE ((ISIPAD)?(1):([[RoationController shared] bigHeight]/568.f))
+// [[RoationController shared] bigHeight]:
+// iPhone8           667.000000, 0.562219
+// iPhone5           568.000000, 0.563380
+// iPhoneX           812.000000, 0.461823
+// iPad Pro(9.7inch) 1024.000000
+#define SCREENRATE ((ISIPAD)?(1):([[RoationController shared] whRate] < 0.55 ? 1.2 : [[RoationController shared] bigHeight]/568.f))
 
 #define MINUTE_PORTRAIT_EXTRA_GAP ((ISIPAD)?(17):(-2))
 #define SECOND_PORTRAIT_EXTRA_GAP ((ISIPAD)?(17):(3))
@@ -252,7 +270,9 @@
         if (!hourLabelView) {
             hourLabelView = [[AMLabelView alloc] initWithFontName:FONT_EXTRABOLD fontSize:HOUR_FONTSIZE*SCREENRATE];
             
-            [self setHourTextAndLabelFrameWithTime:date hourLabel:hourLabelView animated:false];
+            [self setHourTextAndLabelFrameWithTime:date
+                                         hourLabel:hourLabelView
+                                          animated:false];
             
             // 시간 레이블 너비, 좌표 준비
             hourLabelW = hourLabelView.frame.size.width;
@@ -265,7 +285,9 @@
             [rotateView addSubview:hourLabelView];
         } else {
             if (type&tType_hour) {
-                [self setHourTextAndLabelFrameWithTime:date hourLabel:hourLabelView animated:true];
+                [self setHourTextAndLabelFrameWithTime:date
+                                             hourLabel:hourLabelView
+                                              animated:true];
                 
                 // 시간 레이블 너비, 좌표 준비
                 hourLabelW = hourLabelView.frame.size.width;
@@ -285,36 +307,21 @@
         // 오전오후 레이블 설정(없을시 만들기)
         if (![OptionController shared].ampmOff) {
             if (!ampmLabelView) {
-                float ampmW = 0.f;
-                ampmLabelView = [[AMLabelView alloc] initWithFontName:FONT_BOLD fontSize:AMPM_FONTSIZE*SCREENRATE];
+                
+                ampmLabelView = [[AMLabelView alloc] initWithFontName:FONT_BOLD
+                                                             fontSize:AMPM_FONTSIZE*SCREENRATE];
                 [rotateView addSubview:ampmLabelView];
-                if (date.hour<12) {
-                    ampmW = [ampmLabelView changeText:@"오전"];
-                } else {
-                    ampmW = [ampmLabelView changeText:@"오후"];
-                }
-                CGPoint targetPoint = CGPointMake(hourLabelX-ampmLabelView.frame.size.width+0.f,
-                                                  hourLabelY-ampmLabelView.frame.size.height/2.f-ampmLabelView.frame.size.height*AMPM_EXTRAGAP_Y_RATE);
-                ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                 ampmLabelView.frame.size.width, ampmLabelView.frame.size.height);
+                
+                [self setAMPMTextAndLabelFrameWithDate:date
+                                        hourLabelPoint:CGPointMake(hourLabelX, hourLabelY)
+                                              animated:NO];
             } else {
                 if (type&tType_hour) {
-                    if (date.hour<12) {
-                        [ampmLabelView changeText:@"오전"];
-                    } else {
-                        [ampmLabelView changeText:@"오후"];
-                    }
                     
-                    CGPoint targetPoint = CGPointMake(hourLabelX-ampmLabelView.frame.size.width+0.f,
-                                                      hourLabelY-ampmLabelView.frame.size.height/2.f-ampmLabelView.frame.size.height*AMPM_EXTRAGAP_Y_RATE);
-                    [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
-                        [ampmLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
-                        ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
-                                                         ampmLabelView.frame.size.width,
-                                                         ampmLabelView.frame.size.height);
-                    } completion:^(BOOL finished) {
-                        [ampmLabelView removeEasingFunctionForKeyPath:@"center"];
-                    }];
+                    [self setAMPMTextAndLabelFrameWithDate:date
+                                            hourLabelPoint:CGPointMake(hourLabelX, hourLabelY)
+                                                  animated:YES];
+                    
                 } else {
                     
                 }
@@ -329,6 +336,8 @@
         if (!hourLabelView) {
             hourInit=  YES;
             hourLabelView = [[AMLabelView alloc] initWithFontName:FONT_EXTRABOLD fontSize:HOUR_FONTSIZE*SCREENRATE];
+            
+            
             NSString *hourText = nil;
             if (![OptionController shared].ampmOff) {
                 if (date.hour%12==0) {
@@ -695,6 +704,30 @@
     
 }
 
+- (void) setAMPMTextAndLabelFrameWithDate:(NSDate *)date
+                           hourLabelPoint:(CGPoint)hourLabelPoint
+                                 animated:(BOOL)animated {
+    if (date.hour<12) {
+        [ampmLabelView changeText:@"오전"];
+    } else {
+        [ampmLabelView changeText:@"오후"];
+    }
+    CGPoint targetPoint = CGPointMake(hourLabelPoint.x-ampmLabelView.frame.size.width+0.f,
+                                      hourLabelPoint.y-ampmLabelView.frame.size.height/2.f-ampmLabelView.frame.size.height*AMPM_EXTRAGAP_Y_RATE);
+    if (!animated) {
+        ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                         ampmLabelView.frame.size.width, ampmLabelView.frame.size.height);
+    } else {
+        [UIView animateWithDuration:ANI_TEXT_DELAY animations:^{
+            [ampmLabelView setEasingFunction:ExponentialEaseOut forKeyPath:@"center"];
+            ampmLabelView.frame = CGRectMake(targetPoint.x, targetPoint.y,
+                                             ampmLabelView.frame.size.width,
+                                             ampmLabelView.frame.size.height);
+        } completion:^(BOOL finished) {
+            [ampmLabelView removeEasingFunctionForKeyPath:@"center"];
+        }];
+    }
+}
 
 - (void) setHourTextAndLabelFrameWithTime:(NSDate *)date
                                 hourLabel:(AMLabelView *)hourLabel
