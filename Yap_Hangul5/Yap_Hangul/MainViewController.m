@@ -183,8 +183,16 @@
     [[UIApplication sharedApplication] statusBarOrientation] == UIDeviceOrientationLandscapeLeft;
 }
 
-#define BOTTOM_LABEL_Y ((ISIPAD)?(56.f):((winSize.width>winSize.height)?(16.f):(56.f)))
-#define BOTTOM_LABEL_X ((ISIPAD)?(44.f):((winSize.width>winSize.height)?(10.f):(14.f)))
+// [[RoationController shared] bigHeight]:
+// iPhone8           667.000000, 0.562219
+// iPhone5           568.000000, 0.563380
+// iPhoneX           812.000000, 0.461823
+// iPad Pro(9.7inch) 1024.000000
+#define ISIPHONEX ([[RoationController shared] whRate] < 0.55)
+
+
+#define BOTTOM_LABEL_Y ((ISIPAD)?(56.f):((winSize.width>winSize.height)?(ISIPHONEX?-36.5f:16.f):(56.f)))
+#define BOTTOM_LABEL_X ((ISIPAD)?(44.f):((winSize.width>winSize.height)?(ISIPHONEX?44.f:10.f):(14.f)))
 #define BOGGOM_LABEL_GAP_Y 17.f
 #define BOTTOM_LABEL_GAP2_Y 36.f
 - (CGPoint) getYearLabelPoint {
@@ -204,19 +212,17 @@
 
 #define TOP_YEAR_GAP ((ISIPAD)?(40.f):(20.f))
 #define TOP_YEAR_FONTSIZE ((ISIPAD)?(17):(15))
-#define YEAR_POS_Y ((ISIPAD)?(26.f):(18.f))
+#define YEAR_POS_Y ([[RoationController shared] isLandscape]?YEAR_POS_Y_L:YEAR_POS_Y_P)
+#define YEAR_POS_Y_P ((ISIPAD)?(26.f):(ISIPHONEX?48.f:18.f))
+#define YEAR_POS_Y_L ((ISIPAD)?(26.f):(18.f))
 
 #define HOUR_FONTSIZE ((ISIPAD)?(205):(86))
 #define MINUTE_FONTSIZE ((ISIPAD)?(129):(61))
 #define SECOND_FONTSIZE ((ISIPAD)?(30):(20))
 #define AMPM_FONTSIZE ((ISIPAD)?(75):(30))
 
-// [[RoationController shared] bigHeight]:
-// iPhone8           667.000000, 0.562219
-// iPhone5           568.000000, 0.563380
-// iPhoneX           812.000000, 0.461823
-// iPad Pro(9.7inch) 1024.000000
-#define SCREENRATE ((ISIPAD)?(1):([[RoationController shared] whRate] < 0.55 ? 1.2 : [[RoationController shared] bigHeight]/568.f))
+
+#define SCREENRATE ((ISIPAD)?(1):(ISIPHONEX ? 1.2 : [[RoationController shared] bigHeight]/568.f))
 
 #define MINUTE_PORTRAIT_EXTRA_GAP ((ISIPAD)?(17):(-2))
 #define SECOND_PORTRAIT_EXTRA_GAP ((ISIPAD)?(17):(3))
